@@ -1,1 +1,1 @@
-the README file displayed on github
+Shell script to automate the download and "setup" of libraries like Zend Framework, doctrine, etc. on your local machine or server.
