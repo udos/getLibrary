@@ -1,7 +1,0 @@
-.buildpath
-.gitignore
-nbproject/*
-.project
-.settings/*
-tests/log/*
-.zfproject.xml
