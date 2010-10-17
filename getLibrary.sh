@@ -44,6 +44,15 @@ function fctDebug {
 ###############################
 #          MAIN               #
 ###############################
+# check if the user (which launched this script) belongs to group root
+# note: '>/dev/null' redirects the output so user do not see it
+if ! groups | grep -co 'root' >/dev/null
+then
+  # user does not belong to group root -> stop script
+  echo "ERROR: You do not belong to group 'root'. Please log in as root and relaunch script. Stopping script..."
+  exit 1
+fi
+
 # default library path
 PATHBASE="/usr/local/lib/"
 
