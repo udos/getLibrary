@@ -28,8 +28,25 @@
 #     check the website of the library for the available versions
 
 ###############################
-#          FUNCTIONS          #
+#  	  Variables           #
 ###############################
+
+### PATHS ###
+# default library path
+PATHBASE="/usr/local/lib/"
+
+### OTHER ###
+# supported libs variable (used in error messages)
+LIBSSUPPORTED="Zend Framework (zf), Doctrine (doc)"
+
+
+###############################
+#         Functions           #
+###############################
+
+#
+# Purpose: Enable debug mode
+#
 function fctDebug(){
   echo "***** Debug Mode Enabled *****"
   echo "Archive: $ARCHIVE"
@@ -65,10 +82,9 @@ function fctString2Lower(){
   exit 0
 }
 
-
-###############################
-#          MAIN               #
-###############################
+#################################
+# Main Script Logic Starts Here #
+#################################
 # check if the user (which launched this script) belongs to group root
 # note: '>/dev/null' redirects the output so user do not see it
 if ! groups | grep -co 'root' >/dev/null
@@ -77,9 +93,6 @@ then
   echo "ERROR: You do not belong to group 'root'. Please log in as root and relaunch script. Stopping script..."
   exit 1
 fi
-
-# default library path
-PATHBASE="/usr/local/lib/"
 
 # check if default library path exists
 if [ ! -d $PATHBASE ]
@@ -91,8 +104,6 @@ then
   exit 1
 fi
 
-# supported libs variable (for error messages)
-LIBSSUPPORTED="Zend Framework (zf), Doctrine (doc)"
 
 # check if 1st argument was passed
 if [ -z $1 ]
@@ -121,6 +132,7 @@ esac
 
 
 # final path in function of the requested library
+# ToDo: write function fctSetPath to set the path. Consider alpha, beta, stable versions.
 PATHDEST="$PATHBASE$LIB/stable/"
 
 
