@@ -87,6 +87,16 @@ esac
 PATHDEST="$PATHBASE$LIB/stable/"
 
 
+# check if the path exists
+if [ ! -d $PATHDEST ]
+then
+  # path does not exist
+  echo "NOTICE: Directory $PATHDEST does not exist. Creating directory..."
+  mkdir -pv $PATHDEST
+fi
+
+
+
 # check if 2nd argument was passed
 if [ -z $2 ]
 then
@@ -193,7 +203,7 @@ else
 fi
 
 #untar the archive
-tar -zxvf $ARCHIVE
+tar -xvzf $ARCHIVE
 # remove archive
 rm $ARCHIVE
 # rename untared directory
