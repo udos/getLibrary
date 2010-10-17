@@ -30,7 +30,7 @@
 ###############################
 #          FUNCTIONS          #
 ###############################
-function fctDebug {
+function fctDebug(){
   echo "***** Debug Mode Enabled *****"
   echo "Archive: $ARCHIVE"
   echo "Source: $SOURCE"
@@ -40,6 +40,31 @@ function fctDebug {
   echo "***** Debug Mode Disabled (Script stopped) *****"
   exit 0
 }
+
+#
+# Purpose: Transform string to lower
+#
+function fctString2Lower(){
+  
+  # Check if parameter #1 is zero length -> no parameter passed
+  if [ -z "$1" ]
+  then
+    echo "ERROR: No parameter passed. Stopping script..."
+    exit 1
+  fi
+  
+  # Check if parameter #2 was passed -> not allowd -> only parameter #1 allowd
+  if [ "$2" ]
+  then
+    echo "ERROR: Only 1 parameter allowed (Example: fctString2Lower $1). Stopping script..."
+    exit 1
+  fi
+  
+  # convert string to lower case
+  echo $1 | tr [:upper:] [:lower:]
+  exit 0
+}
+
 
 ###############################
 #          MAIN               #
@@ -67,27 +92,30 @@ then
 fi
 
 # supported libs variable (for error messages)
-LIBSSUPPORTED="ZF, doctrine"
+LIBSSUPPORTED="Zend Framework (zf), Doctrine (doc)"
 
 # check if 1st argument was passed
 if [ -z $1 ]
 then
   echo "ERROR: Please provide the library name (e.g. $LIBSSUPPORTED). Stopping script..."
   exit 1
+else
+  LIB=$(fctString2Lower $1)
 fi
 
+
 # verify user requested library
-case $1 in
-  ZF | zf)
+case $LIB in
+  zend | zf)
     # library name
     LIB="ZF"
   ;;
-  doctrine | doc | Doctrine)
+  doctrine | doc)
     # library name
     LIB="Doctrine"
   ;;
   *)
-    echo "ERROR: requested library '$1' not supported. Only the libraries $LIBSSUPPORTED are supported at the moment. Stopping script..."
+    echo "ERROR: requested library '$LIB' not supported. Only the libraries $LIBSSUPPORTED are supported at the moment. Stopping script..."
     exit 1
 esac
 
@@ -100,10 +128,9 @@ PATHDEST="$PATHBASE$LIB/stable/"
 if [ ! -d $PATHDEST ]
 then
   # path does not exist
-  echo "NOTICE: Directory $PATHDEST does not exist. Creating directory..."
+  echo "MESSAGE: Directory $PATHDEST does not exist. Creating directory..."
   mkdir -pv $PATHDEST
 fi
-
 
 
 # check if 2nd argument was passed
@@ -137,16 +164,18 @@ then
   select opt in "${options[@]}"; do
     case ${opt} in
       ${options[0]})
+        CURRENT_DIR=$(pwd)
+#echo $CURRENT_DIR
         rm -r $VERSION
-        echo "Directory $VERSION deleted."
+        echo "MESSAGE: Directory $CURRENT_DIR/$VERSION (including subdirectories) deleted."
         break
         ;;
       (quit)
-        echo "Stopping script."
+        echo "MESSAGE: Stopping script."
         exit 1
         ;;
       (*)
-        echo "You entered a non-valid option ${opt}"; ;;
+        echo "WARNING: You entered a non-valid option ${opt}"; ;;
     esac;
   done
 
@@ -188,31 +217,32 @@ then
     case ${opt} in
       ${options[0]})
         rm $ARCHIVE
-        echo "Archive $ARCHIVE deleted."
+        echo "MESSAGE: Archive $ARCHIVE deleted."
         break
         ;;
       (quit)
-        echo "Stopping script."
+        echo "MESSAGE: Stopping script."
         exit 1
         ;;
       (*)
-        echo "You entered a non-valid option ${opt}"; ;;
+        echo "WARNING: You entered a non-valid option ${opt}"; ;;
     esac;
   done
 
 else
+  echo "MESSAGE: Download archive from: $SOURCE"
   # download archive
   wget $SOURCE
   # $? is <> 0 if previous command produced an error
   if [ "$?" -ne "0" ]
   then
-    echo "ERROR (wget): The url $SOURCE produced an error. Probably the submitted parameter $2 is not correct."
+    echo "ERROR (wget): The url $SOURCE produced an error. Probably the submitted parameter $2 (library version) is not correct."
     exit 1
   fi
 fi
 
 #untar the archive
-tar -xvzf $ARCHIVE
+tar -xzf $ARCHIVE
 # remove archive
 rm $ARCHIVE
 # rename untared directory
