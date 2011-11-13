@@ -3,8 +3,6 @@
 # SCRIPT: getLibrary.sh
 # AUTHOR: Udo Schochtert
 # E-MAIL: u.schochtert@gmail.com
-# DATE:   15.10.2009
-# REV:    not tracked...
 #
 # PLATFORM: Linux
 
@@ -38,7 +36,12 @@ PATHBASE="/usr/local/lib/"
 ### OTHER ###
 # supported libs variable (used in error messages)
 LIBSSUPPORTED="Zend Framework (zf), Doctrine (doc)"
+SCRIPTNAME="getLibrary"
 
+### MESSAGES ###
+MESSAGE="$SCRIPTNAME - MESSAGE"
+WARNING="$SCRIPTNAME - WARNING"
+ERROR="$SCRIPTNAME - ERROR"
 
 ###############################
 #         Functions           #
@@ -66,14 +69,14 @@ function fctString2Lower(){
   # Check if parameter #1 is zero length -> no parameter passed
   if [ -z "$1" ]
   then
-    echo "ERROR: No parameter passed. Stopping script..."
+    echo "$ERROR: No parameter passed. Stopping script..."
     exit 1
   fi
   
   # Check if parameter #2 was passed -> not allowd -> only parameter #1 allowd
   if [ "$2" ]
   then
-    echo "ERROR: Only 1 parameter allowed (Example: fctString2Lower $1). Stopping script..."
+    echo "$ERROR: Only 1 parameter allowed (Example: fctString2Lower $1). Stopping script..."
     exit 1
   fi
   
@@ -90,7 +93,7 @@ function fctString2Lower(){
 if ! groups | grep -co 'root' >/dev/null
 then
   # user does not belong to group root -> stop script
-  echo "ERROR: You do not belong to group 'root'. Please log in as root and relaunch script. Stopping script..."
+  echo "$ERROR: You do not belong to group 'root'. Please log in as root and relaunch script. Stopping script..."
   exit 1
 fi
 
@@ -98,7 +101,7 @@ fi
 if [ ! -d $PATHBASE ]
 then
   # lib path does not exist
-  echo "ERROR: Directory $PATHBASE does not exist. Stopping script..."
+  echo "$ERROR: Directory $PATHBASE does not exist. Stopping script..."
   echo "  Please create the directory path manually."
   echo "  Restart the script."
   exit 1
@@ -108,7 +111,7 @@ fi
 # check if 1st argument was passed
 if [ -z $1 ]
 then
-  echo "ERROR: Please provide the library name (e.g. $LIBSSUPPORTED). Stopping script..."
+  echo "$ERROR: Please provide the library name (e.g. $LIBSSUPPORTED). Stopping script..."
   exit 1
 else
   LIB=$(fctString2Lower $1)
@@ -126,7 +129,7 @@ case $LIB in
     LIB="Doctrine"
   ;;
   *)
-    echo "ERROR: requested library '$LIB' not supported. Only the libraries $LIBSSUPPORTED are supported at the moment. Stopping script..."
+    echo "$ERROR: requested library '$LIB' not supported. Only the libraries $LIBSSUPPORTED are supported at the moment. Stopping script..."
     exit 1
 esac
 
@@ -140,7 +143,7 @@ PATHDEST="$PATHBASE$LIB/stable/"
 if [ ! -d $PATHDEST ]
 then
   # path does not exist
-  echo "MESSAGE: Directory $PATHDEST does not exist. Creating directory..."
+  echo "$MESSAGE: Directory $PATHDEST does not exist. Creating directory..."
   mkdir -pv $PATHDEST
 fi
 
@@ -148,7 +151,7 @@ fi
 # check if 2nd argument was passed
 if [ -z $2 ]
 then
-  echo "ERROR: Please provide the version number. Stopping script..."
+  echo "$ERROR: Please provide the version number. Stopping script..."
   exit 1
 else
   # library version (2nd parameter passed)
@@ -163,7 +166,7 @@ cd $PATHDEST
 # check if version directory already exists
 if [ -d $VERSION ]
 then
-  echo "WARNING: The version directory $VERSION already exists."
+  echo "$WARNING: The version directory $VERSION already exists."
 
   #define options as array
   declare -a options
@@ -179,15 +182,15 @@ then
         CURRENT_DIR=$(pwd)
 #echo $CURRENT_DIR
         rm -r $VERSION
-        echo "MESSAGE: Directory $CURRENT_DIR/$VERSION (including subdirectories) deleted."
+        echo "$MESSAGE: Directory $CURRENT_DIR/$VERSION (including subdirectories) deleted."
         break
         ;;
       (quit)
-        echo "MESSAGE: Stopping script."
+        echo "$MESSAGE: Stopping script."
         exit 1
         ;;
       (*)
-        echo "WARNING: You entered a non-valid option ${opt}"; ;;
+        echo "$WARNING: You entered a non-valid option ${opt}"; ;;
     esac;
   done
 
@@ -215,7 +218,7 @@ esac
 # check if archive already exists
 if [ -e "$ARCHIVE" ]
 then
-  echo "WARNING: The archive $ARCHIVE already exists."
+  echo "$WARNING: The archive $ARCHIVE already exists."
   
   #define options as array
   declare -a options
@@ -229,26 +232,26 @@ then
     case ${opt} in
       ${options[0]})
         rm $ARCHIVE
-        echo "MESSAGE: Archive $ARCHIVE deleted."
+        echo "$MESSAGE: Archive $ARCHIVE deleted."
         break
         ;;
       (quit)
-        echo "MESSAGE: Stopping script."
+        echo "$MESSAGE: Stopping script."
         exit 1
         ;;
       (*)
-        echo "WARNING: You entered a non-valid option ${opt}"; ;;
+        echo "$WARNING: You entered a non-valid option ${opt}"; ;;
     esac;
   done
 
 else
-  echo "MESSAGE: Download archive from: $SOURCE"
+  echo "$MESSAGE: Download archive from: $SOURCE"
   # download archive
   wget $SOURCE
   # $? is <> 0 if previous command produced an error
   if [ "$?" -ne "0" ]
   then
-    echo "ERROR (wget): The url $SOURCE produced an error. Probably the submitted parameter $2 (library version) is not correct."
+    echo "$ERROR (wget): The url $SOURCE produced an error. Probably the submitted parameter $2 (library version) is not correct."
     exit 1
   fi
 fi
@@ -289,6 +292,6 @@ case $USERINPUT in
   ;;
 esac
 
-echo "MESSAGE: Script $0 terminated successfully. :)"
+echo "$MESSAGE: Script $0 terminated successfully. :)"
 exit 0
 # end of script
