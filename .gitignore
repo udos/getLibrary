@@ -1,0 +1,17 @@
+#personally I prefer to commit the .gitignore file -> this way it is clear what is ignored and others can build up from this ;)
+#.gitignore
+
+*~
+.buildpath
+
+#ignore NetBeans IDE directory
+nbproject/*
+
+.project
+.settings/*
+
+# ignore unit test log directory
+tests/log/*
+
+*.swp
+.zfproject.xml

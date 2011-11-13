@@ -5,18 +5,19 @@
 # E-MAIL: u.schochtert@gmail.com
 #
 # PLATFORM: Linux
-
+#           Mac
+#
 # PURPOSE: Script shell to automatically download, extract & symlink a specific version of libraries like ZF, doctrine, etc.
 #          Supported libraries:
 #            + Zend Framework
 #            + Doctrine
-
+#
 # IMPORTANT!!!
-# the library directory has to be writable for the user which is executing this script! Otherwise the download will fail because writing permissions are missing.
-
-# Default library path:
+# Make sure that the directory from which the script is executed is writable for the user which is executing the script! Otherwise the download will fail because writing permissions are missing.
+#
+# Target library path:
 #   /usr/local/lib/<library>/stable/
-
+#
 # USAGE:
 #   ./getLibrary.sh <library> <version>
 #   <library>
@@ -88,14 +89,49 @@ function fctString2Lower(){
 #################################
 # Main Script Logic Starts Here #
 #################################
-# check if the user (which launched this script) belongs to group root
-# note: '>/dev/null' redirects the output so user do not see it
-if ! groups | grep -co 'root' >/dev/null
-then
-  # user does not belong to group root -> stop script
-  echo "$ERROR: You do not belong to group 'root'. Please log in as root and relaunch script. Stopping script..."
-  exit 1
-fi
+
+# detect platform
+PLATFORM="other"
+OS=$(uname)
+
+# determine OS
+case $OS in
+  Linux)
+    # library name
+    PLATFORM="linux"
+  ;;
+  Darwin)
+    # library name
+    PLATFORM="darwin"
+  ;;
+  *)
+    # unknown OS
+    echo "$ERROR: Unknown Operating System. Stopping script..."
+    exit 1
+esac
+
+# check if the user (which launched this script) belongs to an administrator group (e.g. root, admin, etc.)
+# notes:
+#   admin groups are OS dependent
+#   '>/dev/null' redirects the output so user do not see it
+case $OS in
+  Linux)
+    if ! groups | grep -co 'root' >/dev/null
+    then
+      # user does not belong to group root -> stop script
+      echo "$ERROR: You do not belong to group 'root'. Please log in as root and relaunch script. Stopping script..."
+      exit 1
+    fi
+  ;;
+  Darwin)
+    if ! groups | grep -co 'admin' >/dev/null
+    then
+      # user does not belong to group admin -> stop script
+      echo "$ERROR: You do not belong to group 'admin'. Please log in as root and relaunch script. Stopping script..."
+      exit 1
+    fi
+  ;;
+esac
 
 # check if default library path exists
 if [ ! -d $PATHBASE ]
