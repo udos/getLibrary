@@ -244,8 +244,8 @@ case $LIB in
     SOURCE="http://framework.zend.com/releases/ZendFramework-$VERSION/$ARCHIVE"
   ;;
   Doctrine)
-    ARCHIVENAME="Doctrine-$VERSION"
-    ARCHIVEEXT=".tgz"
+    ARCHIVENAME="DoctrineORM-$VERSION-full"
+    ARCHIVEEXT=".tar.gz"
     ARCHIVE=$ARCHIVENAME$ARCHIVEEXT
     SOURCE="http://www.doctrine-project.org/downloads/$ARCHIVE"
   ;;
