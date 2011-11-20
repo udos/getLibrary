@@ -10,7 +10,7 @@
 # PURPOSE: Script shell to automatically download, extract & symlink a specific version of libraries like ZF, doctrine, etc.
 #          Supported libraries:
 #            + Zend Framework
-#            + Doctrine
+#            + Doctrine 2
 #
 # IMPORTANT!!!
 # Make sure that the directory from which the script is executed is writable for the user which is executing the script! Otherwise the download will fail because writing permissions are missing.
@@ -22,7 +22,7 @@
 #   ./getLibrary.sh <library> <version>
 #   <library>
 #     zf  - Zend Framework
-#     doc - Doctrine
+#     doc - Doctrine 2
 #   <version>
 #     check the website of the library for the available versions
 
@@ -36,7 +36,7 @@ PATHBASE="/usr/local/lib/"
 
 ### OTHER ###
 # supported libs variable (used in error messages)
-LIBSSUPPORTED="Zend Framework (zf), Doctrine (doc)"
+LIBSSUPPORTED="Zend Framework (zf), Doctrine2 (doc)"
 SCRIPTNAME="getLibrary"
 
 ### MESSAGES ###
@@ -160,29 +160,14 @@ case $LIB in
     # library name
     LIB="ZF"
   ;;
-  doctrine | doc)
+  doctrine | doctrine2 | doc | doc2)
     # library name
-    LIB="Doctrine"
+    LIB="Doctrine2"
   ;;
   *)
     echo "$ERROR: requested library '$LIB' not supported. Only the libraries $LIBSSUPPORTED are supported at the moment. Stopping script..."
     exit 1
 esac
-
-
-# final path in function of the requested library
-# ToDo: write function fctSetPath to set the path. Consider alpha, beta, stable versions.
-PATHDEST="$PATHBASE$LIB/stable/"
-
-
-# check if the path exists
-if [ ! -d $PATHDEST ]
-then
-  # path does not exist
-  echo "$MESSAGE: Directory $PATHDEST does not exist. Creating directory..."
-  mkdir -pv $PATHDEST
-fi
-
 
 # check if 2nd argument was passed
 if [ -z $2 ]
@@ -192,6 +177,18 @@ then
 else
   # library version (2nd parameter passed)
   VERSION=$2
+fi
+
+# final path in function of the requested library
+# ToDo: write function fctSetPath to set the path. Consider alpha, beta, stable versions.
+PATHDEST="$PATHBASE$LIB/stable/"
+
+# check if the path exists
+if [ ! -d $PATHDEST ]
+then
+  # path does not exist
+  echo "$MESSAGE: Directory $PATHDEST does not exist. Creating directory..."
+  mkdir -pv $PATHDEST
 fi
 
 # change directory (to use directories relative to this dir path)
@@ -243,7 +240,7 @@ case $LIB in
     # source
     SOURCE="http://framework.zend.com/releases/ZendFramework-$VERSION/$ARCHIVE"
   ;;
-  Doctrine)
+  Doctrine2)
     ARCHIVENAME="DoctrineORM-$VERSION-full"
     ARCHIVEEXT=".tar.gz"
     ARCHIVE=$ARCHIVENAME$ARCHIVEEXT
@@ -297,7 +294,16 @@ tar -xzf $ARCHIVE
 # remove archive
 rm $ARCHIVE
 # rename untared directory
-mv $ARCHIVENAME $VERSION
+case $LIB in
+  ZF)
+    mv $ARCHIVENAME $VERSION
+  ;;
+  Doctrine2)
+    mv doctrine-orm $VERSION
+    # move Symfony folder
+    mv $VERSION/Doctrine/Symfony $VERSION/
+  ;;
+esac
 
 # ask user if he wants to change the symbolic link of the latest stable to this version
 cat << EOF
